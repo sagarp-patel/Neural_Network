@@ -6,7 +6,7 @@ import random
 
 class Runner:
     def __init__(self):
-        #Colors that we might need
+        #Colors that I might need
         self.black = (0,0,0)
         self.white = (255, 255, 255)
         self.red   = (200,0,0)
@@ -29,26 +29,32 @@ class Runner:
         self.game_loop()
         pygame.quit()
         quit()
-        
+
+    #Crash Function
     def crash(self):
         self.display_message("You Crashed",50,self.black,self.window_width/2,self.window_height/2)
         self.display_message("Press R to restart",50,self.black,(self.window_width/2),(self.window_height/2)+50)
-        
+
+    #Keep Track of Score
     def score(self,count):
         font = pygame.font.SysFont(None,25)
         scoreBoard = font.render("Score: "+str(count),True,self.black)
         self.window.blit(scoreBoard, (0,800))
 
+    #Draw Obstacles
     def draw_obstacles(self,pos_x, pos_y,radius, color):
         pygame.draw.circle(self.window,color,[pos_x,pos_y],radius)
 
+    #Draw Player
     def draw_Player(self,pos_x, pos_y,width,height):
         pygame.draw.rect(self.window,self.blue,[pos_x,pos_y, width, height])
 
+    #Creates a text object to display message
     def text_object(self,text,font):
         textSurface = font.render(text,True,self.black)
         return textSurface, textSurface.get_rect()
-    
+
+    #This Function will display a message at location x and y
     def display_message(self,text,fontSize,color,x,y):
         largeText = pygame.font.Font('freesansbold.ttf',fontSize)
         TextSurf, TextRect = self.text_object(text,largeText)
@@ -57,6 +63,7 @@ class Runner:
         pygame.display.update()
         time.sleep(2)
 
+    #Intro Screen Function
     def game_intro(self):
         intro = True
         while intro:
@@ -93,10 +100,18 @@ class Runner:
         obstacle_radius = 20
         obstacleCount = 1
         while not exitGame:
+            #Checking if the player was hit or ran into the obstacle
+            if self.player_pos_x >= obstacle_x - obstacle_radius:
+                if obstacle_y - obstacle_radius < self.player_pos_y and obstacle_y + obstacle_radius > self.player_pos_y:
+                    print("crash occured")
+                    self.crash()
+                    exitGame = True
+                    break
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
+                #Move the Player based on input from keyboard when a key is pressed
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         print("SpaceBar is Pressed")
@@ -111,13 +126,16 @@ class Runner:
                             self.delta_y = 5
                         else:
                             self.delta_y = 0
+                #resetting delta when key is released
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_SPACE or event.key == pygame.K_DOWN:
                         self.delta_y = 0
+            # Making Sure the Player doesnt go off screen
             if (self.player_pos_y - 5) < 0 and self.delta_y < 0:
                 self.delta_y = 0
             if self.window_height < self.player_pos_y + self.player_height + 5 and self.delta_y > 0:
                 self.delta_y = 0
+            #Drawing the Window
             self.window.fill(self.grey)
             self.player_pos_y+=self.delta_y
             self.draw_Player(self.player_pos_x,self.player_pos_y,self.player_width, self.player_height)
@@ -125,4 +143,5 @@ class Runner:
             obstacle_x += velocity
             pygame.display.update()
             self.clock.tick(60)
+        self.game_intro()
 
