@@ -17,17 +17,19 @@ class Runner:
         self.player_width  = 50
         self.score = 0
         #Creating the Window
-        self.window_height = 800
-        self.window_width = 1000
+        self.window_height = 600 #800
+        self.window_width = 800 #1000
         self.window = pygame.display.set_mode((self.window_width,self.window_height))
         pygame.display.set_caption("A simple Runner for Neural Net")
         self.clock = pygame.time.Clock()
+        
     def game_start(self):
         pygame.init()
         self.game_intro()
         self.game_loop()
         pygame.quit()
         quit()
+        
     def crash(self):
         self.display_message("You Crashed",50,self.black,self.window_width/2,self.window_height/2)
         self.display_message("Press R to restart",50,self.black,(self.window_width/2),(self.window_height/2)+50)
@@ -78,9 +80,10 @@ class Runner:
     def game_loop(self):
         self.window.fill(self.grey) #clear Window
         pygame.draw.line(self.window,self.black,[0,self.window_height-50],[self.window_width,self.window_height-50])
-        pos_x = 10
-        pos_y = self.window_height - 100
-        self.draw_Player(pos_x,pos_y,self.player_width, self.player_height)
+        self.player_pos_x = 10
+        self.player_pos_y = self.window_height - 100
+        self.draw_Player(self.player_pos_x,self.player_pos_y,self.player_width, self.player_height)
+        self.delta_y = 0
         self.score  = 0
         delta_x = 0
         exitGame = False
@@ -94,12 +97,32 @@ class Runner:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
-            self.window.fill( self.grey)
-            pygame.draw.line(self.window,self.black,[0,self.window_height-50],[self.window_width,self.window_height-50])
-            self.draw_Player(pos_x,pos_y,self.player_width, self.player_height)
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        print("SpaceBar is Pressed")
+                        if (self.player_pos_y - 5) > 0: 
+                            print(self.player_pos_y)
+                            self.delta_y = -5
+                        else:
+                            self.delta_y = 0
+                    if event.key == pygame.K_DOWN:
+                        if self.window_height > self.player_pos_y + self.player_height + 5:
+                            print(self.player_pos_y)
+                            self.delta_y = 5
+                        else:
+                            self.delta_y = 0
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_SPACE or event.key == pygame.K_DOWN:
+                        self.delta_y = 0
+            if (self.player_pos_y - 5) < 0 and self.delta_y < 0:
+                self.delta_y = 0
+            if self.window_height < self.player_pos_y + self.player_height + 5 and self.delta_y > 0:
+                self.delta_y = 0
+            self.window.fill(self.grey)
+            self.player_pos_y+=self.delta_y
+            self.draw_Player(self.player_pos_x,self.player_pos_y,self.player_width, self.player_height)
             self.draw_obstacles(obstacle_x, obstacle_y, obstacle_radius,self.black)
             obstacle_x += velocity
             pygame.display.update()
             self.clock.tick(60)
-
 
