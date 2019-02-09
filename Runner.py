@@ -100,13 +100,6 @@ class Runner:
         obstacle_radius = 20
         obstacleCount = 1
         while not exitGame:
-            #Checking if the player was hit or ran into the obstacle
-            if self.player_pos_x >= obstacle_x - obstacle_radius:
-                if obstacle_y - obstacle_radius < self.player_pos_y and obstacle_y + obstacle_radius > self.player_pos_y:
-                    print("crash occured")
-                    self.crash()
-                    exitGame = True
-                    break
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -135,6 +128,13 @@ class Runner:
                 self.delta_y = 0
             if self.window_height < self.player_pos_y + self.player_height + 5 and self.delta_y > 0:
                 self.delta_y = 0
+            #Checking if the player was hit or ran into the obstacle
+            if self.player_pos_x + self.player_width >= obstacle_x - obstacle_radius:
+                if obstacle_y - obstacle_radius <= self.player_pos_y and obstacle_y + obstacle_radius > self.player_pos_y:
+                    print("crash occured")
+                    self.crash()
+                    exitGame = True
+                    break
             #Drawing the Window
             self.window.fill(self.grey)
             self.player_pos_y+=self.delta_y
