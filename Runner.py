@@ -3,6 +3,15 @@ import pygame
 import time
 import random
 
+class Obstacle:
+    def __init__(self, pos_x, pos_y, radius,velocity,color):
+        print("Obstacle Class")
+        self.x = pos_x
+        self.y = pos_y
+        self.radius = radius
+        self.color = color
+        self.velocity = velocity
+        
 
 class Runner:
     def __init__(self):
@@ -42,8 +51,12 @@ class Runner:
         self.window.blit(scoreBoard, (0,800))
 
     #Draw Obstacles
-    def draw_obstacles(self,pos_x, pos_y,radius, color):
+    def draw_obstacle(self,pos_x, pos_y,radius, color):
         pygame.draw.circle(self.window,color,[pos_x,pos_y],radius)
+
+    def draw_obstacles(self,obst_list,color):
+        for obst in obst_list:
+            self.draw_obstacle(obst.x,obst.y,obst.radius,obst.color)
 
     #Draw Player
     def draw_Player(self,pos_x, pos_y,width,height):
@@ -61,8 +74,23 @@ class Runner:
         TextRect.center = (x,y)
         self.window.blit(TextSurf,TextRect)
         pygame.display.update()
-        time.sleep(2)
+        #time.sleep(0.001)
+        #self.game_loop()
 
+    #Move the Player Up
+    def move_up(self):
+        self.delta_y+= -10
+
+    #Move the Player Down
+    def move_down(self):
+        self.delta_y+=10
+
+    #Move Obstacles
+    def move_obst(self,obst_lst,velocity):
+        for obst in obst_lst:
+            obst.x+=velocity
+                
+                    
     #Intro Screen Function
     def game_intro(self):
         intro = True
@@ -96,9 +124,15 @@ class Runner:
         exitGame = False
         obstacle_x = self.window_width
         obstacle_y = random.randrange(0, self.window_height - 150)
-        velocity = -4
+        #(self, pos_x, pos_y, radius,velocity,color)
+        self.velocity = -4
+        obst = Obstacle(self.window_width,random.randrange(0, self.window_height - 150),20,self.velocity,self.black)
+        obst1 = Obstacle(self.window_width,random.randrange(0, self.window_height - 150),20,self.velocity,self.blue)
+        obst_lst = []
+        obst_lst.append(obst)
+        #obst_lst.append(obst1)
         obstacle_radius = 20
-        obstacleCount = 1
+        obstacle_count = 1
         while not exitGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -110,13 +144,15 @@ class Runner:
                         print("SpaceBar is Pressed")
                         if (self.player_pos_y - 5) > 0: 
                             print(self.player_pos_y)
-                            self.delta_y = -5
+                            #self.delta_y = -5
+                            self.move_up()
                         else:
                             self.delta_y = 0
                     if event.key == pygame.K_DOWN:
                         if self.window_height > self.player_pos_y + self.player_height + 5:
                             print(self.player_pos_y)
-                            self.delta_y = 5
+                            #self.delta_y = 5
+                            self.move_down()
                         else:
                             self.delta_y = 0
                 #resetting delta when key is released
@@ -128,20 +164,29 @@ class Runner:
                 self.delta_y = 0
             if self.window_height < self.player_pos_y + self.player_height + 5 and self.delta_y > 0:
                 self.delta_y = 0
-            #Checking if the player was hit or ran into the obstacle
-            if self.player_pos_x + self.player_width >= obstacle_x - obstacle_radius:
-                if obstacle_y - obstacle_radius <= self.player_pos_y and obstacle_y + obstacle_radius > self.player_pos_y:
-                    print("crash occured")
-                    self.crash()
-                    exitGame = True
-                    break
             #Drawing the Window
             self.window.fill(self.grey)
             self.player_pos_y+=self.delta_y
             self.draw_Player(self.player_pos_x,self.player_pos_y,self.player_width, self.player_height)
-            self.draw_obstacles(obstacle_x, obstacle_y, obstacle_radius,self.black)
-            obstacle_x += velocity
+            self.draw_obstacles(obst_lst,self.black) #Keep
+            self.move_obst(obst_lst,self.velocity)
+            #Detecting if a collision has happened
+            if self.player_pos_x + self.player_width >= obst.x - obst.radius:
+                if obst.y - obst.radius <= self.player_pos_y + self.player_height and obst.y + obst.radius > self.player_pos_y:
+                    print("crash occured")
+                    self.crash()
+                    exitGame = True
+                    break
+                    crashed = True
+                    print("Detected Crash")
             pygame.display.update()
+            self.display_message("Score: "+str(obstacle_count),10,self.white,30,10)
             self.clock.tick(60)
+            #Updating the Location of Obstacle
+            if obst.x + obst.radius <= 0:
+                obst.x = self.window_width
+                obst.y = random.randrange(0, self.window_height - 150)
+                obstacle_count+=1
+                obst.velocity-=1
         self.game_intro()
 
