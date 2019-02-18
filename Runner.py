@@ -74,7 +74,7 @@ class Runner:
         TextRect.center = (x,y)
         self.window.blit(TextSurf,TextRect)
         pygame.display.update()
-        #time.sleep(0.001)
+        time.sleep(2)
         #self.game_loop()
 
     #Move the Player Up
@@ -132,7 +132,7 @@ class Runner:
         obst_lst.append(obst)
         #obst_lst.append(obst1)
         obstacle_radius = 20
-        obstacle_count = 1
+        obstacle_count = 0
         while not exitGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -179,14 +179,17 @@ class Runner:
                     break
                     crashed = True
                     print("Detected Crash")
+            largeText = pygame.font.Font('freesansbold.ttf',10)
+            TextSurf, TextRect = self.text_object("Score: "+str(obstacle_count),largeText)
+            TextRect.center = (30,10)
+            self.window.blit(TextSurf,TextRect)
             pygame.display.update()
-            self.display_message("Score: "+str(obstacle_count),10,self.white,30,10)
+            #self.display_message("Score: "+str(obstacle_count),10,self.white,30,10)
             self.clock.tick(60)
             #Updating the Location of Obstacle
             if obst.x + obst.radius <= 0:
                 obst.x = self.window_width
                 obst.y = random.randrange(0, self.window_height - 150)
                 obstacle_count+=1
-                obst.velocity-=1
         self.game_intro()
 
