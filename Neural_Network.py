@@ -14,6 +14,9 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import accuracy_score
 np.random.seed(0)
 
+import time
+from threading import Thread
+
 #Neural Network Class
 class Neural_Network:
     def __init__(self):
@@ -24,7 +27,6 @@ class Neural_Network:
         #In the output the player can go up or down
         self.weights_1 = np.random.randn(self.middle,1)
         self.weights_2 = np.random.randn(self.output,1)
-        print("This is a Neural Network")
         
     def forward(self, x):
         self.input_middle = np.dot(x,self.weights_1)
@@ -42,13 +44,14 @@ class Neural_Network:
         print("nothing to return here")
 
     def train(self, X, y):
-        self.runner.game_start()
-        input_x = [self.player_pos_x,self.player_pos_y,,]
+        game_thread = Thread(target = self.runner.game_start)
+        game_thread.setDaemon(True)
+        game_thread.start()
+        input_x = [self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y]
         for i in range(10):
-            input_x = [self.runner.]
-            self.forward()
-            
-        print("nothing to return here")
+            input_x = [self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y]
+            output = self.forward(input_x)
+            print(output)
 
     def saveWeights(self):
         print("nothing to return here")

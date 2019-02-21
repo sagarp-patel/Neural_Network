@@ -22,8 +22,12 @@ class Runner:
         self.green = (0,200,0)
         self.blue  = (0,0,200)
         self.grey  = (232,232,232)
+        #Player Values
         self.player_height = 50
         self.player_width  = 50
+        self.player_pos_x = 0
+        self.player_pos_y = 0
+        #Game Values
         self.score = 0
         #Creating the Window
         self.window_height = 600 #800
@@ -31,7 +35,12 @@ class Runner:
         self.window = pygame.display.set_mode((self.window_width,self.window_height))
         pygame.display.set_caption("A simple Runner for Neural Net")
         self.clock = pygame.time.Clock()
-        
+        #Creating the Obstacle
+        #Obstacle Values
+        self.velocity = -4
+        self.obst = Obstacle(self.window_width,random.randrange(0, self.window_height - 150),20,self.velocity,self.black)
+
+        #Starting point of game initializes pygame so that it could be used
     def game_start(self):
         pygame.init()
         self.game_intro()
@@ -125,11 +134,9 @@ class Runner:
         obstacle_x = self.window_width
         obstacle_y = random.randrange(0, self.window_height - 150)
         #(self, pos_x, pos_y, radius,velocity,color)
-        self.velocity = -4
-        obst = Obstacle(self.window_width,random.randrange(0, self.window_height - 150),20,self.velocity,self.black)
         obst1 = Obstacle(self.window_width,random.randrange(0, self.window_height - 150),20,self.velocity,self.blue)
         obst_lst = []
-        obst_lst.append(obst)
+        obst_lst.append(self.obst)
         #obst_lst.append(obst1)
         obstacle_radius = 20
         obstacle_count = 0
@@ -171,8 +178,8 @@ class Runner:
             self.draw_obstacles(obst_lst,self.black) #Keep
             self.move_obst(obst_lst,self.velocity)
             #Detecting if a collision has happened
-            if self.player_pos_x + self.player_width >= obst.x - obst.radius:
-                if obst.y - obst.radius <= self.player_pos_y + self.player_height and obst.y + obst.radius > self.player_pos_y:
+            if self.player_pos_x + self.player_width >= self.obst.x - self.obst.radius:
+                if self.obst.y - self.obst.radius <= self.player_pos_y + self.player_height and self.obst.y + self.obst.radius > self.player_pos_y:
                     print("crash occured")
                     self.crash()
                     exitGame = True
@@ -187,9 +194,9 @@ class Runner:
             #self.display_message("Score: "+str(obstacle_count),10,self.white,30,10)
             self.clock.tick(60)
             #Updating the Location of Obstacle
-            if obst.x + obst.radius <= 0:
-                obst.x = self.window_width
-                obst.y = random.randrange(0, self.window_height - 150)
+            if self.obst.x + self.obst.radius <= 0:
+                self.obst.x = self.window_width
+                self.obst.y = random.randrange(0, self.window_height - 150)
                 obstacle_count+=1
         self.game_intro()
 
