@@ -29,6 +29,8 @@ class Runner:
         self.player_pos_y = 0
         #Game Values
         self.score = 0
+        self.intro = False
+        self.exitGame = True
         #Creating the Window
         self.window_height = 600 #800
         self.window_width = 800 #1000
@@ -102,8 +104,8 @@ class Runner:
                     
     #Intro Screen Function
     def game_intro(self):
-        intro = True
-        while intro:
+        self.intro = True
+        while self.intro:
             self.window.fill(self.grey)
             self.display_message("Press Space to Start the Game!!!",30,self.white,self.window_width/2,self.window_height/2)
             for event in pygame.event.get():
@@ -113,7 +115,7 @@ class Runner:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         print("SpaceBar is Pressed")
-                        intro = False
+                        self.intro = False
                     if event.key == pygame.K_ESCAPE:
                         print("ESC is pressed")
                         pygame.quit()
@@ -130,7 +132,7 @@ class Runner:
         self.delta_y = 0
         self.score  = 0
         delta_x = 0
-        exitGame = False
+        self.exitGame = False
         obstacle_x = self.window_width
         obstacle_y = random.randrange(0, self.window_height - 150)
         #(self, pos_x, pos_y, radius,velocity,color)
@@ -140,7 +142,7 @@ class Runner:
         #obst_lst.append(obst1)
         obstacle_radius = 20
         obstacle_count = 0
-        while not exitGame:
+        while not self.exitGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -182,7 +184,7 @@ class Runner:
                 if self.obst.y - self.obst.radius <= self.player_pos_y + self.player_height and self.obst.y + self.obst.radius > self.player_pos_y:
                     print("crash occured")
                     self.crash()
-                    exitGame = True
+                    self.exitGame = True
                     break
                     crashed = True
                     print("Detected Crash")

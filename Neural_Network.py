@@ -25,7 +25,7 @@ class Neural_Network:
         self.middle = 4
         self.output = 3
         #In the output the player can go up or down
-        self.weights_1 = np.random.randn(self.middle,1)
+        self.weights_1 = np.random.randn(self.middle,self.input)
         self.weights_2 = np.random.randn(self.output,1)
         
     def forward(self, x):
@@ -47,11 +47,11 @@ class Neural_Network:
         game_thread = Thread(target = self.runner.game_start)
         game_thread.setDaemon(True)
         game_thread.start()
-        input_x = [self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y]
-        for i in range(10):
-            input_x = [self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y]
-            output = self.forward(input_x)
-            print(output)
+        self.predict()
+        #net_thread = Thread(target = self.predict)
+        #net_thread.setDaemon(True)
+        #net_thread.start()
+        
 
     def saveWeights(self):
         print("nothing to return here")
@@ -64,4 +64,26 @@ class Neural_Network:
         return error
     
     def predict(self):
-        print("Hello")
+        while not self.runner.intro:
+            print("wait for the game to start")
+            self.runner.intro = False
+            break
+            time.sleep(1)
+        input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+        while self.runner.exitGame:
+            time.sleep(.5)
+        while not self.runner.exitGame:
+            input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            output = self.forward(input_x)
+            print ("Output: ",)
+            print(output)
+            maxed = max(output)
+            if maxed == output[0]:
+                self.runner.move_up()
+            elif maxed == output[1]:
+                continue
+            elif maxed == output[2]:
+                self.runner.move_down()
+            else:
+                continue
+            time.sleep(1)
