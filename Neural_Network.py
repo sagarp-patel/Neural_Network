@@ -26,7 +26,9 @@ class Neural_Network:
         self.output = 3
         #In the output the player can go up or down
         self.weights_1 = np.random.randn(self.middle,self.input)
-        self.weights_2 = np.random.randn(self.output,1)
+        self.weights_2 = np.random.randn(self.output,self.middle-1)
+        print(self.weights_1)
+        print(self.weights_2)
         
     def forward(self, x):
         self.input_middle = np.dot(x,self.weights_1)
@@ -44,9 +46,12 @@ class Neural_Network:
         print("nothing to return here")
 
     def train(self, X, y):
+        #Save Code to show Andrew for his project
         game_thread = Thread(target = self.runner.game_start)
         game_thread.setDaemon(True)
         game_thread.start()
+        #p = multiprocessing.Process(target=self.runner.game_start)
+        #p.start()
         self.predict()
         #net_thread = Thread(target = self.predict)
         #net_thread.setDaemon(True)
@@ -81,9 +86,11 @@ class Neural_Network:
             if maxed == output[0]:
                 self.runner.move_up()
             elif maxed == output[1]:
+                time.sleep(1)
                 continue
             elif maxed == output[2]:
                 self.runner.move_down()
             else:
+                time.sleep(1)
                 continue
             time.sleep(1)

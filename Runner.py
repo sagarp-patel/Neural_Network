@@ -5,7 +5,6 @@ import random
 
 class Obstacle:
     def __init__(self, pos_x, pos_y, radius,velocity,color):
-        print("Obstacle Class")
         self.x = pos_x
         self.y = pos_y
         self.radius = radius
@@ -114,10 +113,8 @@ class Runner:
                     quit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        print("SpaceBar is Pressed")
                         self.intro = False
                     if event.key == pygame.K_ESCAPE:
-                        print("ESC is pressed")
                         pygame.quit()
                         quit()
                 pygame.display.update()
@@ -150,16 +147,13 @@ class Runner:
                 #Move the Player based on input from keyboard when a key is pressed
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        print("SpaceBar is Pressed")
                         if (self.player_pos_y - 5) > 0: 
-                            print(self.player_pos_y)
                             #self.delta_y = -5
                             self.move_up()
                         else:
                             self.delta_y = 0
                     if event.key == pygame.K_DOWN:
                         if self.window_height > self.player_pos_y + self.player_height + 5:
-                            print(self.player_pos_y)
                             #self.delta_y = 5
                             self.move_down()
                         else:
@@ -182,7 +176,6 @@ class Runner:
             #Detecting if a collision has happened
             if self.player_pos_x + self.player_width >= self.obst.x - self.obst.radius:
                 if self.obst.y - self.obst.radius <= self.player_pos_y + self.player_height and self.obst.y + self.obst.radius > self.player_pos_y:
-                    print("crash occured")
                     self.crash()
                     self.exitGame = True
                     break
