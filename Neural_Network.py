@@ -31,7 +31,8 @@ class Neural_Network:
         print(self.weights_2)
         
     def forward(self, x):
-        self.input_middle = np.dot(x,self.weights_1)
+        input_x = copy.deepcopy(x)
+        self.input_middle = np.dot(input_x,self.weights_1)
         self.input_middle = self.sigmoid(self.input_middle)
         self.middle_output = np.dot(self.input_middle,self.weights_2)
         self.output_layer = self.sigmoid(self.middle_output)
@@ -42,8 +43,12 @@ class Neural_Network:
 
     def sigmoidPrime(self, value):
         return value*(1-value)
-    def backward(self,X,y,o):
-        print("nothing to return here")
+    def backward(self,given_input,expected_output,predicted_output):
+        self.error = expected_output - predicted_output
+        self.delta = self.error * self.sigmoidPrime(self.predicted_output)
+
+        self.output_error = self.delta.dot(self.weights_2.T)
+        self.d_delta = self.output_error * self.sigmoidPrime(self.input_middle)
 
     def train(self, X, y):
         #Save Code to show Andrew for his project
@@ -59,7 +64,8 @@ class Neural_Network:
         
 
     def saveWeights(self):
-        print("nothing to return here")
+        np.savetxt("weights_1.txt",self.weights_1,fmt="%s")
+        np.savetxt("weights_2.txt",self.weights_2,fmt="%s")
     def lossFunction(self,predicted_y,actual_y):
         #We will use Mean Squared Error for our loss
         # Loss = sum of (pred_y - actual_y)^2
@@ -93,4 +99,6 @@ class Neural_Network:
             else:
                 time.sleep(1)
                 continue
+            #What should our Y be in order for this to work out perfectly??            y = 0
+            self.backward(input_x,y,output)
             time.sleep(1)
