@@ -21,18 +21,18 @@ from threading import Thread
 class Neural_Network:
     def __init__(self):
         self.runner = Runner()
-        self.input = 3
-        self.middle = 4
+        self.input = 4
+        self.middle = 5
         self.output = 3
         #In the output the player can go up or down
-        self.weights_1 = np.random.randn(self.middle,self.input)
-        self.weights_2 = np.random.randn(self.output,self.middle-1)
+        self.weights_1 = np.random.randn(self.middle,1)
+        self.weights_2 = np.random.randn(self.middle,1)
         print(self.weights_1)
         print(self.weights_2)
         
     def forward(self, x):
-        input_x = copy.deepcopy(x)
-        self.input_middle = np.dot(input_x,self.weights_1)
+        #input_x = copy.deepcopy(x)
+        self.input_middle = np.dot(self.weights_1,x)
         self.input_middle = self.sigmoid(self.input_middle)
         self.middle_output = np.dot(self.input_middle,self.weights_2)
         self.output_layer = self.sigmoid(self.middle_output)
@@ -43,12 +43,30 @@ class Neural_Network:
 
     def sigmoidPrime(self, value):
         return value*(1-value)
+    
     def backward(self,given_input,expected_output,predicted_output):
+        print("expected_output")
+        print(expected_output)
+        print("predicted_output")
+        print(predicted_output)     
+        #output_calculated = np.array([predicted_output[0] - predicted_output[2],predicted_output[1] - predicted_output[3]])
         self.error = expected_output - predicted_output
-        self.delta = self.error * self.sigmoidPrime(self.predicted_output)
-
+        print("error: ",)
+        print(self.error)
+        print("predicted output: ",)
+        print(predicted_output)
+        self.delta = self.error * self.sigmoidPrime(predicted_output)
+        print("delta: ",)
+        print(self.delta)
+        print(self.weights_2)
         self.output_error = self.delta.dot(self.weights_2.T)
+        print("output_error")
+        print(self.output_error)
+        print("X")
+        print(given_input)
         self.d_delta = self.output_error * self.sigmoidPrime(self.input_middle)
+        self.weights_1 = given_input.T.dot(self.d_delta)
+        self.weights_2 = self.input_middle.T.dot(self.delta)
 
     def train(self, X, y):
         #Save Code to show Andrew for his project
@@ -57,7 +75,37 @@ class Neural_Network:
         game_thread.start()
         #p = multiprocessing.Process(target=self.runner.game_start)
         #p.start()
-        self.predict()
+        #self.predict()
+        while not self.runner.intro:
+            print("wait for the game to start")
+            self.runner.intro = False
+            break
+            time.sleep(1)
+        input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+        while self.runner.exitGame:
+            time.sleep(.5)
+        while not self.runner.exitGame:
+            input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            output = self.forward(input_x)
+            output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            print(output)
+            maxed = max(output)
+            if maxed == output[0]:
+                self.runner.move_up()
+                output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            elif maxed == output[1]:
+                time.sleep(1)
+            elif maxed == output[2]:
+                self.runner.move_down()
+                output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            else:
+                time.sleep(1)
+                continue
+            #What should our Y be in order for this to work out perfectly??
+            y = [0,0,1]
+            self.backward(input_x,y,output)
+            time.sleep(1)
+        self.saveWeights()
         #net_thread = Thread(target = self.predict)
         #net_thread.setDaemon(True)
         #net_thread.start()
@@ -75,30 +123,4 @@ class Neural_Network:
         return error
     
     def predict(self):
-        while not self.runner.intro:
-            print("wait for the game to start")
-            self.runner.intro = False
-            break
-            time.sleep(1)
-        input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
-        while self.runner.exitGame:
-            time.sleep(.5)
-        while not self.runner.exitGame:
-            input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
-            output = self.forward(input_x)
-            print ("Output: ",)
-            print(output)
-            maxed = max(output)
-            if maxed == output[0]:
-                self.runner.move_up()
-            elif maxed == output[1]:
-                time.sleep(1)
-                continue
-            elif maxed == output[2]:
-                self.runner.move_down()
-            else:
-                time.sleep(1)
-                continue
-            #What should our Y be in order for this to work out perfectly??            y = 0
-            self.backward(input_x,y,output)
-            time.sleep(1)
+        print("")
