@@ -25,8 +25,8 @@ class Neural_Network:
         self.middle = 5
         self.output = 3
         #In the output the player can go up or down
-        self.weights_1 = np.random.randn(self.middle,1)
-        self.weights_2 = np.random.randn(self.middle,1)
+        self.weights_1 = np.random.randn(self.middle,self.input)
+        self.weights_2 = np.random.randn(self.middle,self.output)
         print(self.weights_1)
         print(self.weights_2)
         
@@ -45,26 +45,28 @@ class Neural_Network:
         return value*(1-value)
     
     def backward(self,given_input,expected_output,predicted_output):
-        print("expected_output")
+        print("expected_output",end=": ")
         print(expected_output)
-        print("predicted_output")
+        print("predicted_output",end=": ")
         print(predicted_output)     
         #output_calculated = np.array([predicted_output[0] - predicted_output[2],predicted_output[1] - predicted_output[3]])
         self.error = expected_output - predicted_output
-        print("error: ",)
+        print("error: ",end=": ")
         print(self.error)
-        print("predicted output: ",)
+        print("predicted output: ",end=": ")
         print(predicted_output)
         self.delta = self.error * self.sigmoidPrime(predicted_output)
-        print("delta: ",)
+        print("delta: ",end=": ")
         print(self.delta)
         print(self.weights_2)
         self.output_error = self.delta.dot(self.weights_2.T)
-        print("output_error")
+        print("output_error",end=": ")
         print(self.output_error)
-        print("X")
+        print("X",end=": ")
         print(given_input)
         self.d_delta = self.output_error * self.sigmoidPrime(self.input_middle)
+        print("d_delta",end=": ")
+        print(self.d_delta)
         self.weights_1 = given_input.T.dot(self.d_delta)
         self.weights_2 = self.input_middle.T.dot(self.delta)
 
@@ -85,26 +87,41 @@ class Neural_Network:
         while self.runner.exitGame:
             time.sleep(.5)
         while not self.runner.exitGame:
+            time.sleep(2)
             input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            player_x = self.runner.player_pos_x
+            obstacle_x = self.runner.obst.x
+            player_y = self.runner.player_pos_y
+            obstacle_y = obstacle_x = self.runner.obst.x
+            #Forward Propagation := Making the decision to move up, down or stay the same
             output = self.forward(input_x)
             output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            print("Output: ",)
             print(output)
             maxed = max(output)
             if maxed == output[0]:
+                print("Option A")
                 self.runner.move_up()
                 output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
             elif maxed == output[1]:
+                print("Option B")
+                continue
                 time.sleep(1)
             elif maxed == output[2]:
+                print("Option C")
                 self.runner.move_down()
                 output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
             else:
+                print("Default Option")
                 time.sleep(1)
                 continue
             #What should our Y be in order for this to work out perfectly??
-            y = [0,0,1]
+            y = [0,0,0]
+            if obstacle_y == player_y:
+                y = [1,0,1]
+            else:
+                y = [0,1,0]
             self.backward(input_x,y,output)
-            time.sleep(1)
         self.saveWeights()
         #net_thread = Thread(target = self.predict)
         #net_thread.setDaemon(True)
