@@ -193,5 +193,6 @@ class Runner:
                 self.obst.x = self.window_width
                 self.obst.y = random.randrange(0, self.window_height - 150)
                 obstacle_count+=1
+                self.score = obstacle_count
         self.game_intro()
 
