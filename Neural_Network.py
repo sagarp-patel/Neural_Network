@@ -22,7 +22,7 @@ class Neural_Network:
     def __init__(self):
         self.runner = Runner()
         self.input = 4
-        self.middle = 5
+        self.middle = 4
         self.output = 3
         #In the output the player can go up or down
         self.weights_1 = np.random.randn(self.middle,self.input)
@@ -45,30 +45,16 @@ class Neural_Network:
         return value*(1-value)
     
     def backward(self,given_input,expected_output,predicted_output):
-        print("expected_output",end=": ")
-        print(expected_output)
-        print("predicted_output",end=": ")
-        print(predicted_output)     
         #output_calculated = np.array([predicted_output[0] - predicted_output[2],predicted_output[1] - predicted_output[3]])
         self.error = expected_output - predicted_output
-        print("error: ",end=": ")
-        print(self.error)
-        print("predicted output: ",end=": ")
-        print(predicted_output)
         self.delta = self.error * self.sigmoidPrime(predicted_output)
-        print("delta: ",end=": ")
-        print(self.delta)
-        print(self.weights_2)
         self.output_error = self.delta.dot(self.weights_2.T)
-        print("output_error",end=": ")
-        print(self.output_error)
-        print("X",end=": ")
-        print(given_input)
         self.d_delta = self.output_error * self.sigmoidPrime(self.input_middle)
-        print("d_delta",end=": ")
-        print(self.d_delta)
         self.weights_1 = given_input.T.dot(self.d_delta)
-        self.weights_2 = self.input_middle.T.dot(self.delta)
+        self.scaled_middle = np.array([self.input_middle[0],self.input_middle[1],self.input_middle[2]])
+        #self.weights_2 = self.scaled_middle.T.dot(self.delta)
+        print("Weights_1",end=": ")
+        print(self.weights_1)
 
     def train(self, X, y):
         #Save Code to show Andrew for his project
@@ -87,12 +73,17 @@ class Neural_Network:
         while self.runner.exitGame:
             time.sleep(.5)
         while not self.runner.exitGame:
-            time.sleep(2)
+            #time.sleep(.5)
+            if(self.runner.exitGame):
+                break
             input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
             player_x = self.runner.player_pos_x
             obstacle_x = self.runner.obst.x
             player_y = self.runner.player_pos_y
             obstacle_y = obstacle_x = self.runner.obst.x
+            #Check if the Array is a 0D Array or = None
+            if input_x.all() == None:
+                break
             #Forward Propagation := Making the decision to move up, down or stay the same
             output = self.forward(input_x)
             output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
@@ -105,7 +96,6 @@ class Neural_Network:
                 output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
             elif maxed == output[1]:
                 print("Option B")
-                continue
                 time.sleep(1)
             elif maxed == output[2]:
                 print("Option C")
@@ -129,7 +119,9 @@ class Neural_Network:
         
 
     def saveWeights(self):
-        np.savetxt("weights_1.txt",self.weights_1,fmt="%s")
+        file_weights1 = open("weights_1.txt","w")
+        file_weights1.write(str(self.weights_1))
+        #np.savetxt("weights_1.txt",self.weights_1,fmt="%s")
         np.savetxt("weights_2.txt",self.weights_2,fmt="%s")
     def lossFunction(self,predicted_y,actual_y):
         #We will use Mean Squared Error for our loss

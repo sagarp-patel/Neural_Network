@@ -176,8 +176,8 @@ class Runner:
             #Detecting if a collision has happened
             if self.player_pos_x + self.player_width >= self.obst.x - self.obst.radius:
                 if self.obst.y - self.obst.radius <= self.player_pos_y + self.player_height and self.obst.y + self.obst.radius > self.player_pos_y:
-                    self.crash()
                     self.exitGame = True
+                    self.crash()
                     break
                     crashed = True
                     print("Detected Crash")
