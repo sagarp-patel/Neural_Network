@@ -21,8 +21,8 @@ from threading import Thread
 class Neural_Network:
     def __init__(self):
         self.runner = Runner()
-        self.input = 4
-        self.middle = 4
+        self.input = 3
+        self.middle = 3
         self.output = 3
         #In the output the player can go up or down
         self.weights_1 = np.random.randn(self.middle,self.input)
@@ -52,7 +52,7 @@ class Neural_Network:
         self.d_delta = self.output_error * self.sigmoidPrime(self.input_middle)
         self.weights_1 = given_input.T.dot(self.d_delta)
         self.scaled_middle = np.array([self.input_middle[0],self.input_middle[1],self.input_middle[2]])
-        #self.weights_2 = self.scaled_middle.T.dot(self.delta)
+        self.weights_2 = self.scaled_middle.T.dot(self.delta)
         print("Weights_1",end=": ")
         print(self.weights_1)
 
@@ -69,14 +69,16 @@ class Neural_Network:
             self.runner.intro = False
             break
             time.sleep(1)
-        input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+        #input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])#,self.runner.obst.y])
         while self.runner.exitGame:
             time.sleep(.5)
         while not self.runner.exitGame:
             #time.sleep(.5)
             if(self.runner.exitGame):
                 break
-            input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            #input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])
             player_x = self.runner.player_pos_x
             obstacle_x = self.runner.obst.x
             player_y = self.runner.player_pos_y
@@ -93,14 +95,16 @@ class Neural_Network:
             if maxed == output[0]:
                 print("Option A")
                 self.runner.move_up()
-                output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+                #output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+                output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])#,self.runner.obst.y])
             elif maxed == output[1]:
                 print("Option B")
                 time.sleep(1)
             elif maxed == output[2]:
                 print("Option C")
                 self.runner.move_down()
-                output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+                #output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+                output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])
             else:
                 print("Default Option")
                 time.sleep(1)
