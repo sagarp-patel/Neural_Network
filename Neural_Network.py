@@ -27,6 +27,16 @@ class Neural_Network:
         #In the output the player can go up or down
         self.weights_1 = np.random.randn(self.middle,self.input)
         self.weights_2 = np.random.randn(self.middle,self.output)
+        weight_fileA = open("weights_1.txt","r")
+        weight_fileB = open("weights_2.txt","r")
+        '''
+        weightA = float(weight_fileA.readline())
+        weightB = float(weight_fileB.readline())
+        if weightA != None:
+            self.weights_1 = np.array([weightA,weightA,weightA])
+        if weightB != None:
+            self.weights_2 = np.array([weightB,weightB,weightB])
+        '''
         print(self.weights_1)
         print(self.weights_2)
         
@@ -59,23 +69,27 @@ class Neural_Network:
         print(self.weights_2)
 
     def train(self, X, y):
-        #Save Code to show Andrew for his project
+        #Run the game on different thread so nothing freezes
         game_thread = Thread(target = self.runner.game_start)
         game_thread.setDaemon(True)
         game_thread.start()
+<<<<<<< HEAD
+=======
+        #This while loop is to skip the intro
+>>>>>>> b988c0651c5bf756027a2a112d0e72e3bc88e8da
         while not self.runner.intro:
             print("wait for the game to start")
             self.runner.intro = False
             break
             time.sleep(1)
             input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])#,self.runner.obst.y])
+        #Wait while the game is loaded
         while self.runner.exitGame:
             time.sleep(.5)
+        #Now the game is loaded so we can use the neural network
         while not self.runner.exitGame:
-            #time.sleep(.5)
             if(self.runner.exitGame):
                 break
-            #input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
             input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])
             player_x = self.runner.player_pos_x
             obstacle_x = self.runner.obst.x
@@ -95,7 +109,6 @@ class Neural_Network:
                 print("Option A")
                 option = "A"
                 self.runner.move_up()
-                #output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
                 output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])#,self.runner.obst.y])
                 time.sleep(1)
             elif maxed == output[1]:
@@ -106,7 +119,6 @@ class Neural_Network:
                 print("Option C")
                 option = "C"
                 self.runner.move_down()
-                #output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
                 output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])
                 time.sleep(1)
             else:
@@ -116,9 +128,14 @@ class Neural_Network:
             #What should our Y be in order for this to work out perfectly??
             y = [0,0,0]
             if obstacle_y == player_y:
-                y = [1,0,1]
+                y = [0,0,1]
+            elif obstacle_y + self.runner.obst.radius > player_y:
+                y = [1,0,0]
+            elif obstacle_y - self.runner.obst.radius <= player_y:
+                y = [0,0,1]
             else:
                 y = [0,1,0]
+<<<<<<< HEAD
             if self.runner.obst.y - self.runner.obst.radius <= player_y:
                 y = [0,0,1]
             if self.runner.obst.y + self.runner.obst.radius >= player_y:
@@ -136,7 +153,11 @@ class Neural_Network:
                     y = [1,0,0]
                 self.runner.game_loop()
                 time.sleep(5)
+=======
+            #Backward Propogation to make the neural network learn
+>>>>>>> b988c0651c5bf756027a2a112d0e72e3bc88e8da
             self.backward(input_x,y,output)
+            print(self.runner.score)
         self.saveWeights()
         
 
@@ -145,7 +166,11 @@ class Neural_Network:
         file_weights1.write(str(self.weights_1))
         file_weights2 = open("weights_2.txt","w")
         file_weights2.write(str(self.weights_2))
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> b988c0651c5bf756027a2a112d0e72e3bc88e8da
     def lossFunction(self,predicted_y,actual_y):
         #We will use Mean Squared Error for our loss
         # Loss = sum of (pred_y - actual_y)^2
