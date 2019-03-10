@@ -73,10 +73,7 @@ class Neural_Network:
         game_thread = Thread(target = self.runner.game_start)
         game_thread.setDaemon(True)
         game_thread.start()
-<<<<<<< HEAD
-=======
         #This while loop is to skip the intro
->>>>>>> b988c0651c5bf756027a2a112d0e72e3bc88e8da
         while not self.runner.intro:
             print("wait for the game to start")
             self.runner.intro = False
@@ -135,7 +132,6 @@ class Neural_Network:
                 y = [0,0,1]
             else:
                 y = [0,1,0]
-<<<<<<< HEAD
             if self.runner.obst.y - self.runner.obst.radius <= player_y:
                 y = [0,0,1]
             if self.runner.obst.y + self.runner.obst.radius >= player_y:
@@ -153,9 +149,7 @@ class Neural_Network:
                     y = [1,0,0]
                 self.runner.game_loop()
                 time.sleep(5)
-=======
             #Backward Propogation to make the neural network learn
->>>>>>> b988c0651c5bf756027a2a112d0e72e3bc88e8da
             self.backward(input_x,y,output)
             print(self.runner.score)
         self.saveWeights()
@@ -166,11 +160,7 @@ class Neural_Network:
         file_weights1.write(str(self.weights_1))
         file_weights2 = open("weights_2.txt","w")
         file_weights2.write(str(self.weights_2))
-<<<<<<< HEAD
         
-=======
-
->>>>>>> b988c0651c5bf756027a2a112d0e72e3bc88e8da
     def lossFunction(self,predicted_y,actual_y):
         #We will use Mean Squared Error for our loss
         # Loss = sum of (pred_y - actual_y)^2
