@@ -55,21 +55,19 @@ class Neural_Network:
         self.weights_2 = self.scaled_middle.T.dot(self.delta)
         print("Weights_1",end=": ")
         print(self.weights_1)
+        print("Weights_2",end=": ")
+        print(self.weights_2)
 
     def train(self, X, y):
         #Save Code to show Andrew for his project
         game_thread = Thread(target = self.runner.game_start)
         game_thread.setDaemon(True)
         game_thread.start()
-        #p = multiprocessing.Process(target=self.runner.game_start)
-        #p.start()
-        #self.predict()
         while not self.runner.intro:
             print("wait for the game to start")
             self.runner.intro = False
             break
             time.sleep(1)
-        #input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
             input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])#,self.runner.obst.y])
         while self.runner.exitGame:
             time.sleep(.5)
@@ -86,6 +84,7 @@ class Neural_Network:
             #Check if the Array is a 0D Array or = None
             if input_x.all() == None:
                 break
+            option = ""
             #Forward Propagation := Making the decision to move up, down or stay the same
             output = self.forward(input_x)
             output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
@@ -94,17 +93,22 @@ class Neural_Network:
             maxed = max(output)
             if maxed == output[0]:
                 print("Option A")
+                option = "A"
                 self.runner.move_up()
                 #output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
                 output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])#,self.runner.obst.y])
+                time.sleep(1)
             elif maxed == output[1]:
                 print("Option B")
+                option = "B"
                 time.sleep(1)
             elif maxed == output[2]:
                 print("Option C")
+                option = "C"
                 self.runner.move_down()
                 #output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
                 output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])
+                time.sleep(1)
             else:
                 print("Default Option")
                 time.sleep(1)
@@ -115,18 +119,33 @@ class Neural_Network:
                 y = [1,0,1]
             else:
                 y = [0,1,0]
+            if self.runner.obst.y - self.runner.obst.radius <= player_y:
+                y = [0,0,1]
+            if self.runner.obst.y + self.runner.obst.radius >= player_y:
+                y = [1,0,0]
+            if player_y +50 >= self.runner.window_height:
+                y = [1,0,0]
+            if player_y - 50 <= 0:
+                y = [0,0,1]
+            if self.runner.crashed:
+                if option == "A":
+                    y = [0,0,1]
+                if option == "B":
+                    y = [1,0,1]
+                if option == "C":
+                    y = [1,0,0]
+                self.runner.game_loop()
+                time.sleep(5)
             self.backward(input_x,y,output)
         self.saveWeights()
-        #net_thread = Thread(target = self.predict)
-        #net_thread.setDaemon(True)
-        #net_thread.start()
         
 
     def saveWeights(self):
         file_weights1 = open("weights_1.txt","w")
         file_weights1.write(str(self.weights_1))
-        #np.savetxt("weights_1.txt",self.weights_1,fmt="%s")
-        np.savetxt("weights_2.txt",self.weights_2,fmt="%s")
+        file_weights2 = open("weights_2.txt","w")
+        file_weights2.write(str(self.weights_2))
+        
     def lossFunction(self,predicted_y,actual_y):
         #We will use Mean Squared Error for our loss
         # Loss = sum of (pred_y - actual_y)^2

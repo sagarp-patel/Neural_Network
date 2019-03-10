@@ -46,13 +46,13 @@ class Runner:
         pygame.init()
         self.game_intro()
         self.game_loop()
-        pygame.quit()
-        quit()
+        #pygame.quit()
+        #quit()
 
     #Crash Function
     def crash(self):
         self.display_message("You Crashed",50,self.black,self.window_width/2,self.window_height/2)
-        self.display_message("Press R to restart",50,self.black,(self.window_width/2),(self.window_height/2)+50)
+        #self.display_message("Press R to restart",50,self.black,(self.window_width/2),(self.window_height/2)+50)
 
     #Keep Track of Score
     def score(self,count):
@@ -110,21 +110,22 @@ class Runner:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    quit()
+                    #quit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         self.intro = False
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        quit()
+                        #quit()
                 pygame.display.update()
                 self.clock.tick(10)
         
     def game_loop(self):
+        self.crashed = False
         self.window.fill(self.grey) #clear Window
         pygame.draw.line(self.window,self.black,[0,self.window_height-50],[self.window_width,self.window_height-50])
         self.player_pos_x = 10
-        self.player_pos_y = self.window_height - 100
+        self.player_pos_y = self.window_height - self.window_height/2
         self.draw_Player(self.player_pos_x,self.player_pos_y,self.player_width, self.player_height)
         self.delta_y = 0
         self.score  = 0
@@ -144,6 +145,8 @@ class Runner:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
+                    print("Quit Detected")
+                '''
                 #Move the Player based on input from keyboard when a key is pressed
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
@@ -158,6 +161,7 @@ class Runner:
                             self.move_down()
                         else:
                             self.delta_y = 0
+                        '''
                 #resetting delta when key is released
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_SPACE or event.key == pygame.K_DOWN:
@@ -177,9 +181,9 @@ class Runner:
             if self.player_pos_x + self.player_width >= self.obst.x - self.obst.radius:
                 if self.obst.y - self.obst.radius <= self.player_pos_y + self.player_height and self.obst.y + self.obst.radius > self.player_pos_y:
                     self.exitGame = True
+                    self.crashed = True
                     self.crash()
                     break
-                    crashed = True
                     print("Detected Crash")
             largeText = pygame.font.Font('freesansbold.ttf',10)
             TextSurf, TextRect = self.text_object("Score: "+str(obstacle_count),largeText)
@@ -193,5 +197,5 @@ class Runner:
                 self.obst.x = self.window_width
                 self.obst.y = random.randrange(0, self.window_height - 150)
                 obstacle_count+=1
-        self.game_intro()
+                self.score = obstacle_count
 
