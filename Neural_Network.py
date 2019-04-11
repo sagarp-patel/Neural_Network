@@ -22,7 +22,7 @@ class Neural_Network:
     def __init__(self):
         self.runner = Runner()
         self.input = 3
-        self.middle = 5
+        self.middle = 6
         self.output = 3
         #In the output the player can go up or down
         self.weights_1 = np.random.randn(self.middle,1)
@@ -70,11 +70,20 @@ class Neural_Network:
         #output_calculated = np.array([predicted_output[0] - predicted_output[2],predicted_output[1] - predicted_output[3]])
         self.output_error = expected_output - predicted_output
         self.delta = self.output_error * self.sigmoidPrime(predicted_output)
-        self.error = self.delta.dot(self.weights_2.T)
-        self.d_delta = self.error * self.sigmoidPrime(self.input_middle)
-        self.weights_1 = given_input.T.dot(self.d_delta)
+        print("delta: ")
+        print(self.delta)
+        print("weights_2")
+        print(self.weights_2)
+        self.error = self.forward_layer(self.delta,self.weights_2)# self.delta.dot(self.weights_2.T)
+        #self.d_delta = self.error * self.sigmoidPrime(self.input_middle)
+        self.d_delta = self.sigmoidPrime(self.input_middle)
+        print("sigmoidPrime(input_middle): ")
+        print(self.d_delta)
+        print("error: ")
+        print(self.error)
+        self.weights_2 = given_input.T.dot(self.d_delta)
         self.scaled_middle = np.array([self.input_middle[0],self.input_middle[1],self.input_middle[2]])
-        self.weights_2 = self.scaled_middle.T.dot(self.delta)
+        self.weights_1 = self.scaled_middle.T.dot(self.delta)
         print("Weights_1",end=": ")
         print(self.weights_1)
         print("Weights_2",end=": ")
