@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-
+import copy
 import sklearn
 import sklearn.datasets
 import sklearn.linear_model
@@ -22,11 +22,11 @@ class Neural_Network:
     def __init__(self):
         self.runner = Runner()
         self.input = 3
-        self.middle = 3
+        self.middle = 5
         self.output = 3
         #In the output the player can go up or down
-        self.weights_1 = np.random.randn(self.middle,self.input)
-        self.weights_2 = np.random.randn(self.middle,self.output)
+        self.weights_1 = np.random.randn(self.middle,1)
+        self.weights_2 = np.random.randn(self.output,1)
         weight_fileA = open("weights_1.txt","r")
         weight_fileB = open("weights_2.txt","r")
         '''
@@ -39,12 +39,24 @@ class Neural_Network:
         '''
         print(self.weights_1)
         print(self.weights_2)
-        
+
+    def dot_product(self,array,multiplier):
+        product = 0
+        for i in range(len(array)):
+            product+= array[i]*multiplier
+        return product
+            
+    def forward_layer(self,layer1, weights):
+        result_layer = []
+        for i in range(len(weights)):
+            result_layer.append(self.dot_product(layer1,weights[i]))
+        return np.array(result_layer)
     def forward(self, x):
-        #input_x = copy.deepcopy(x)
-        self.input_middle = np.dot(self.weights_1,x)
+        self.input_middle = self.forward_layer(x,self.weights_1)# np.dot(self.weights_1,x)
         self.input_middle = self.sigmoid(self.input_middle)
-        self.middle_output = np.dot(self.input_middle,self.weights_2)
+        print(self.input_middle)
+        self.middle_output = self.forward_layer(self.input_middle,self.weights_2)#np.dot(self.input_middle,self.weights_2)
+        print(self.middle_output)
         self.output_layer = self.sigmoid(self.middle_output)
         return self.output_layer
     
@@ -56,10 +68,10 @@ class Neural_Network:
     
     def backward(self,given_input,expected_output,predicted_output):
         #output_calculated = np.array([predicted_output[0] - predicted_output[2],predicted_output[1] - predicted_output[3]])
-        self.error = expected_output - predicted_output
-        self.delta = self.error * self.sigmoidPrime(predicted_output)
-        self.output_error = self.delta.dot(self.weights_2.T)
-        self.d_delta = self.output_error * self.sigmoidPrime(self.input_middle)
+        self.output_error = expected_output - predicted_output
+        self.delta = self.output_error * self.sigmoidPrime(predicted_output)
+        self.error = self.delta.dot(self.weights_2.T)
+        self.d_delta = self.error * self.sigmoidPrime(self.input_middle)
         self.weights_1 = given_input.T.dot(self.d_delta)
         self.scaled_middle = np.array([self.input_middle[0],self.input_middle[1],self.input_middle[2]])
         self.weights_2 = self.scaled_middle.T.dot(self.delta)
@@ -68,7 +80,7 @@ class Neural_Network:
         print("Weights_2",end=": ")
         print(self.weights_2)
 
-    def train(self, X, y):
+    def train(self, X, target):
         #Run the game on different thread so nothing freezes
         game_thread = Thread(target = self.runner.game_start)
         game_thread.setDaemon(True)
@@ -147,8 +159,10 @@ class Neural_Network:
                     y = [1,0,1]
                 if option == "C":
                     y = [1,0,0]
-                self.runner.game_loop()
-                time.sleep(5)
+                #game_thread._Thread_stop()
+                if self.runner.score >= target:
+                    self.runner.quitGame = True
+                time.sleep(9)
             #Backward Propogation to make the neural network learn
             self.backward(input_x,y,output)
             print(self.runner.score)
@@ -171,3 +185,7 @@ class Neural_Network:
     
     def predict(self):
         print("")
+
+nn = Neural_Network()
+
+nn.forward(np.array([50,20,100]))

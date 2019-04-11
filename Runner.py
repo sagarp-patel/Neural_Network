@@ -2,7 +2,7 @@
 import pygame
 import time
 import random
-
+import pickle
 class Obstacle:
     def __init__(self, pos_x, pos_y, radius,velocity,color):
         self.x = pos_x
@@ -30,6 +30,7 @@ class Runner:
         self.score = 0
         self.intro = False
         self.exitGame = True
+        self.quitGame = False
         #Creating the Window
         self.window_height = 600 #800
         self.window_width = 800 #1000
@@ -45,7 +46,9 @@ class Runner:
     def game_start(self):
         pygame.init()
         self.game_intro()
-        self.game_loop()
+        while not self.quitGame:
+            self.game_loop()
+            self.display_message("Press Space to Start the Game!!!",30,self.white,self.window_width/2,self.window_height/2)
         #pygame.quit()
         #quit()
 
@@ -140,6 +143,8 @@ class Runner:
         #obst_lst.append(obst1)
         obstacle_radius = 20
         obstacle_count = 0
+        self.player_pos_x = 0
+        self.player_pos_y = 0
         while not self.exitGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
