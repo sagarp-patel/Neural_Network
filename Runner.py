@@ -25,7 +25,7 @@ class Runner:
         self.player_height = 50
         self.player_width  = 50
         self.player_pos_x = 0
-        self.player_pos_y = 0
+        self.player_pos_y = 300
         #Game Values
         self.score = 0
         self.intro = False
@@ -48,7 +48,7 @@ class Runner:
         self.game_intro()
         while not self.quitGame:
             self.game_loop()
-            self.display_message("Press Space to Start the Game!!!",30,self.white,self.window_width/2,self.window_height/2)
+            #self.display_message("Press Space to Start the Game!!!",30,self.white,self.window_width/2,self.window_height/2)
         #pygame.quit()
         #quit()
 
@@ -136,6 +136,7 @@ class Runner:
         self.exitGame = False
         obstacle_x = self.window_width
         obstacle_y = random.randrange(0, self.window_height - 150)
+        obstacle_y = self.player_pos_y
         #(self, pos_x, pos_y, radius,velocity,color)
         obst1 = Obstacle(self.window_width,random.randrange(0, self.window_height - 150),20,self.velocity,self.blue)
         obst_lst = []
@@ -151,22 +152,6 @@ class Runner:
                     pygame.quit()
                     quit()
                     print("Quit Detected")
-                '''
-                #Move the Player based on input from keyboard when a key is pressed
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        if (self.player_pos_y - 5) > 0: 
-                            #self.delta_y = -5
-                            self.move_up()
-                        else:
-                            self.delta_y = 0
-                    if event.key == pygame.K_DOWN:
-                        if self.window_height > self.player_pos_y + self.player_height + 5:
-                            #self.delta_y = 5
-                            self.move_down()
-                        else:
-                            self.delta_y = 0
-                        '''
                 #resetting delta when key is released
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_SPACE or event.key == pygame.K_DOWN:
@@ -189,7 +174,6 @@ class Runner:
                     self.crashed = True
                     self.crash()
                     break
-                    print("Detected Crash")
             largeText = pygame.font.Font('freesansbold.ttf',10)
             TextSurf, TextRect = self.text_object("Score: "+str(obstacle_count),largeText)
             TextRect.center = (30,10)
@@ -201,5 +185,6 @@ class Runner:
             if self.obst.x + self.obst.radius <= 0:
                 self.obst.x = self.window_width
                 self.obst.y = random.randrange(0, self.window_height - 150)
+                self.obst.y = self.player_pos_y
                 obstacle_count+=1
                 self.score = obstacle_count

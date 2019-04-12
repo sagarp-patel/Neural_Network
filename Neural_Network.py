@@ -31,14 +31,6 @@ class Neural_Network:
         self.weights_2 = np.random.randn(self.output,1)
         weight_fileA = open("weights_1.txt","r")
         weight_fileB = open("weights_2.txt","r")
-        '''
-        weightA = float(weight_fileA.readline())
-        weightB = float(weight_fileB.readline())
-        if weightA != None:
-            self.weights_1 = np.array([weightA,weightA,weightA])
-        if weightB != None:
-            self.weights_2 = np.array([weightB,weightB,weightB])
-        '''
         print("Weights 1: ",end="")
         print(self.weights_1)
         print("Weights 2: ",end="")
@@ -46,11 +38,11 @@ class Neural_Network:
 
     def dot_product(self,array,multiplier):
         product = 0
-        print("**************************************************************")
+        print("DotProduct Start**************************************************************")
         for i in range(len(array)):
-            print(product)
             product+= array[i]*multiplier
-        print("**************************************************************")
+        print(product)
+        print("Dot Product End**************************************************************")
         return product
             
     def forward_layer(self,layer1, weights):
@@ -65,7 +57,8 @@ class Neural_Network:
         self.middle_output = self.forward_layer(self.input_middle,self.weights_2)#np.dot(self.input_middle,self.weights_2)
         print(self.middle_output)
         self.output_layer = self.sigmoid(self.middle_output)
-        return self.output_layer
+        output = [self.output_layer[0],self.output_layer[1],self.output_layer[2]]
+        return output
     
     def sigmoid(self, value):
         return 1/(1+np.exp(-value))
@@ -88,48 +81,39 @@ class Neural_Network:
         print(result)
         print("subtract_arr END*********************************************************")
         return result
-        
+    def multiply_arr(self, array1, array2):
+        if len(array1) != len(array2):
+            return
+        result = []
+        for i in range(len(array1)):
+            result.append((array1[i]*array2[i]))
+        return result
+    def combine_arr(self,array1,array2):
+        combined = []
+        for i in range((len(array1)+len(array2))):
+            if i < len(array1):
+                combined.append(array1[i])
+            if i >= len(array1):
+                combined.append(array2[i-len(array1)])
+        return combined
     def backward(self,given_input,expected_output,predicted_output):
         print("Backward Start*********************************************************")
         self.delta = self.subtract_arr(predicted_output,expected_output)
-        print("preducted - actual")
-        print(self.delta)
+        copy_weights = self.weights_2
         #Get the dot product of delta times learning rate
         dotproduct_delta = self.dot_product(self.delta,self.learning_rate)
-        print("Delta: ",end="")
-        print(dotproduct_delta)
-        self.weights_2 = self.weights_2 - dotproduct_delta*(self.weights_2)
+        self.weights_2 = self.subtract_arr(self.weights_2,dotproduct_delta*(self.weights_2))
+        #self.weights_1 = self.weights_1 - dotproduct_delta*(given_input)*copy_weights
+        weight1_update = dotproduct_delta*(self.multiply_arr(given_input,copy_weights))
+        split_weight1a = [self.weights_1[0:3]]
+        split_weight1b = [self.weights_1[3:]]
+        self.weights_1 = self.combine_arr((self.subtract_arr(split_weight1a,weight1_update)),(self.subtract_arr(split_weight1b,weight1_update)))
+        self.weights_1 = np.concatenate(self.weights_1)
         print("Weights 1: ",end="")
         print(self.weights_1)
         print("Weights 2: ",end="")
         print(self.weights_2)
         print("Backward End*********************************************************")
-        '''
-        #output_calculated = np.array([predicted_output[0] - predicted_output[2],predicted_output[1] - predicted_output[3]])
-        #self.output_error = (1/2)*(math.pow((expected_output - predicted_output),2))
-        self.output_error = self.calculate_error(expected_output,predicted_output)
-        print("output error")
-        print(self.output_error)
-        self.delta = self.output_error * self.sigmoidPrime(predicted_output)
-        print("delta: ")
-        print(self.delta)
-        print("weights_2")
-        print(self.weights_2)
-        self.error = self.forward_layer(self.delta,self.weights_2)# self.delta.dot(self.weights_2.T)
-        #self.d_delta = self.error * self.sigmoidPrime(self.input_middle)
-        self.d_delta = self.sigmoidPrime(self.input_middle)
-        print("sigmoidPrime(input_middle): ")
-        print(self.d_delta)
-        print("error: ")
-        print(self.error)
-        self.weights_2 = given_input.T.dot(self.d_delta)
-        self.scaled_middle = np.array([self.input_middle[0],self.input_middle[1],self.input_middle[2]])
-        self.weights_1 = self.scaled_middle.T.dot(self.delta)
-        print("Weights_1",end=": ")
-        print(self.weights_1)
-        print("Weights_2",end=": ")
-        print(self.weights_2)
-        '''
 
     def train(self, X, target,learning_rate):
         #Set learning rate to new learning rate
@@ -176,6 +160,7 @@ class Neural_Network:
             elif maxed == output[1]:
                 print("Option B")
                 option = "B"
+                self.runner.move_down()
                 time.sleep(1)
             elif maxed == output[2]:
                 print("Option C")
@@ -215,7 +200,8 @@ class Neural_Network:
                 #game_thread._Thread_stop()
                 if self.runner.score >= target:
                     self.runner.quitGame = True
-                time.sleep(9)
+            time.sleep(2)
+                    
             #Backward Propogation to make the neural network learn
             self.backward(input_x,y,output)
             print(self.runner.score)
