@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import copy
+import math
 import sklearn
 import sklearn.datasets
 import sklearn.linear_model
@@ -24,6 +25,7 @@ class Neural_Network:
         self.input = 3
         self.middle = 6
         self.output = 3
+        self.learning_rate = 0
         #In the output the player can go up or down
         self.weights_1 = np.random.randn(self.middle,1)
         self.weights_2 = np.random.randn(self.output,1)
@@ -37,13 +39,18 @@ class Neural_Network:
         if weightB != None:
             self.weights_2 = np.array([weightB,weightB,weightB])
         '''
+        print("Weights 1: ",end="")
         print(self.weights_1)
+        print("Weights 2: ",end="")
         print(self.weights_2)
 
     def dot_product(self,array,multiplier):
         product = 0
+        print("**************************************************************")
         for i in range(len(array)):
+            print(product)
             product+= array[i]*multiplier
+        print("**************************************************************")
         return product
             
     def forward_layer(self,layer1, weights):
@@ -65,10 +72,44 @@ class Neural_Network:
 
     def sigmoidPrime(self, value):
         return value*(1-value)
+
+    def calculate_error(self,predicted_output,actual_output):
+        error = []
+        for i in range(len(actual_output)):
+            error.append((1/2)*(math.pow((predicted_output[i]-actual_output[i]),2)))
+        error = np.array(error)
+        return error
     
+    def subtract_arr(self,arr1,arr2):
+        print("subtract_arr Start*********************************************************")#There is no error checking for the size of the array
+        result = []
+        for i in range(len(arr1)):
+            result.append(arr1[i] - arr2[i])
+        print(result)
+        print("subtract_arr END*********************************************************")
+        return result
+        
     def backward(self,given_input,expected_output,predicted_output):
+        print("Backward Start*********************************************************")
+        self.delta = self.subtract_arr(predicted_output,expected_output)
+        print("preducted - actual")
+        print(self.delta)
+        #Get the dot product of delta times learning rate
+        dotproduct_delta = self.dot_product(self.delta,self.learning_rate)
+        print("Delta: ",end="")
+        print(dotproduct_delta)
+        self.weights_2 = self.weights_2 - dotproduct_delta*(self.weights_2)
+        print("Weights 1: ",end="")
+        print(self.weights_1)
+        print("Weights 2: ",end="")
+        print(self.weights_2)
+        print("Backward End*********************************************************")
+        '''
         #output_calculated = np.array([predicted_output[0] - predicted_output[2],predicted_output[1] - predicted_output[3]])
-        self.output_error = expected_output - predicted_output
+        #self.output_error = (1/2)*(math.pow((expected_output - predicted_output),2))
+        self.output_error = self.calculate_error(expected_output,predicted_output)
+        print("output error")
+        print(self.output_error)
         self.delta = self.output_error * self.sigmoidPrime(predicted_output)
         print("delta: ")
         print(self.delta)
@@ -88,8 +129,11 @@ class Neural_Network:
         print(self.weights_1)
         print("Weights_2",end=": ")
         print(self.weights_2)
+        '''
 
-    def train(self, X, target):
+    def train(self, X, target,learning_rate):
+        #Set learning rate to new learning rate
+        self.learning_rate = learning_rate
         #Run the game on different thread so nothing freezes
         game_thread = Thread(target = self.runner.game_start)
         game_thread.setDaemon(True)
@@ -119,7 +163,7 @@ class Neural_Network:
             option = ""
             #Forward Propagation := Making the decision to move up, down or stay the same
             output = self.forward(input_x)
-            output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y])
+            output_y = [self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.x,self.runner.obst.y]
             print("Output: ",)
             print(output)
             maxed = max(output)
@@ -127,7 +171,7 @@ class Neural_Network:
                 print("Option A")
                 option = "A"
                 self.runner.move_up()
-                output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])#,self.runner.obst.y])
+                output_y = [self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y]#,self.runner.obst.y])
                 time.sleep(1)
             elif maxed == output[1]:
                 print("Option B")
@@ -137,7 +181,7 @@ class Neural_Network:
                 print("Option C")
                 option = "C"
                 self.runner.move_down()
-                output_y = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])
+                output_y = [self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y]
                 time.sleep(1)
             else:
                 print("Default Option")
@@ -196,5 +240,4 @@ class Neural_Network:
         print("")
 
 nn = Neural_Network()
-
 nn.forward(np.array([50,20,100]))
