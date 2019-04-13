@@ -52,13 +52,21 @@ class Neural_Network:
         return np.array(result_layer)
     def forward(self, x):
         self.input_middle = self.forward_layer(x,self.weights_1)# np.dot(self.weights_1,x)
+        #self.input_middle = np.dot(self.weights_1,x)
+        self.input_middle = self.sigmoid(self.input_middle)
+        self.middle_output = self.forward_layer(self.input_middle,self.weights_2)#np.dot(self.input_middle,self.weights_2)
+        #self.middle_output = np.dot(self.input_middle,self.weights_2)
+        self.output_layer = self.sigmoid(self.middle_output)
+        return self.output_layer
+        '''
+        self.input_middle = self.forward_layer(x,self.weights_1)# np.dot(self.weights_1,x)
         self.input_middle = self.sigmoid(self.input_middle)
         print(self.input_middle)
         self.middle_output = self.forward_layer(self.input_middle,self.weights_2)#np.dot(self.input_middle,self.weights_2)
         print(self.middle_output)
         self.output_layer = self.sigmoid(self.middle_output)
         output = [self.output_layer[0],self.output_layer[1],self.output_layer[2]]
-        return output
+        return output'''
     
     def sigmoid(self, value):
         return 1/(1+np.exp(-value))
@@ -133,17 +141,18 @@ class Neural_Network:
         while self.runner.exitGame:
             time.sleep(.5)
         #Now the game is loaded so we can use the neural network
-        while not self.runner.exitGame:
-            if(self.runner.exitGame):
-                break
+            self.runner.score = 0
+        while target > self.runner.score:
+            #if(self.runner.exitGame):
+                #break
             input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])
             player_x = self.runner.player_pos_x
             obstacle_x = self.runner.obst.x
             player_y = self.runner.player_pos_y
             obstacle_y = obstacle_x = self.runner.obst.x
             #Check if the Array is a 0D Array or = None
-            if input_x.all() == None:
-                break
+            #if input_x.all() == None:
+                #break
             option = ""
             #Forward Propagation := Making the decision to move up, down or stay the same
             output = self.forward(input_x)
@@ -180,8 +189,6 @@ class Neural_Network:
                 y = [1,0,0]
             elif obstacle_y - self.runner.obst.radius <= player_y:
                 y = [0,0,1]
-            else:
-                y = [0,1,0]
             if self.runner.obst.y - self.runner.obst.radius <= player_y:
                 y = [0,0,1]
             if self.runner.obst.y + self.runner.obst.radius >= player_y:
