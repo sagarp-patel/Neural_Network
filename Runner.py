@@ -65,7 +65,7 @@ class Runner:
 
     #Draw Obstacles
     def draw_obstacle(self,pos_x, pos_y,radius, color):
-        pygame.draw.circle(self.window,color,[pos_x,pos_y],radius)
+        pygame.draw.circle(self.window,color,[int(pos_x),int(pos_y)],radius)
 
     def draw_obstacles(self,obst_list,color):
         for obst in obst_list:
@@ -144,8 +144,6 @@ class Runner:
         #obst_lst.append(obst1)
         obstacle_radius = 20
         obstacle_count = 0
-        self.player_pos_x = 0
-        self.player_pos_y = 0
         while not self.exitGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

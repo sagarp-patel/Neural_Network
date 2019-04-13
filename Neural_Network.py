@@ -169,7 +169,7 @@ class Neural_Network:
             elif maxed == output[1]:
                 print("Option B")
                 option = "B"
-                self.runner.move_down()
+                #self.runner.move_down()
                 time.sleep(1)
             elif maxed == output[2]:
                 print("Option C")
@@ -206,7 +206,7 @@ class Neural_Network:
                     y = [1,0,0]
                 #game_thread._Thread_stop()
                 if self.runner.score >= target:
-                    self.runner.quitGame = True
+                    break
             time.sleep(2)
                     
             #Backward Propogation to make the neural network learn
