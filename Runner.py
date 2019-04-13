@@ -30,6 +30,7 @@ class Runner:
         self.score = 0
         self.intro = False
         self.exitGame = True
+        self.quitGame = False
         #Creating the Window
         self.window_height = 600 #800
         self.window_width = 800 #1000
@@ -45,7 +46,8 @@ class Runner:
     def game_start(self):
         pygame.init()
         self.game_intro()
-        self.game_loop()
+        while not self.quitGame:
+            self.game_loop()
         #pygame.quit()
         #quit()
 
@@ -132,7 +134,7 @@ class Runner:
         delta_x = 0
         self.exitGame = False
         obstacle_x = self.window_width
-        obstacle_y = random.randrange(0, self.window_height - 150)
+        obstacle_y = self.player_pos_y #random.randrange(0, self.window_height - 150)
         #(self, pos_x, pos_y, radius,velocity,color)
         obst1 = Obstacle(self.window_width,random.randrange(0, self.window_height - 150),20,self.velocity,self.blue)
         obst_lst = []
@@ -195,6 +197,6 @@ class Runner:
             #Updating the Location of Obstacle
             if self.obst.x + self.obst.radius <= 0:
                 self.obst.x = self.window_width
-                self.obst.y = random.randrange(0, self.window_height - 150)
+                self.obst.y = int(self.player_pos_y)#random.randrange(0, self.window_height - 150)
                 obstacle_count+=1
                 self.score = obstacle_count

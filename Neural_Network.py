@@ -68,7 +68,7 @@ class Neural_Network:
         print("Weights_2",end=": ")
         print(self.weights_2)
 
-    def train(self, X, y):
+    def train(self, X, y,target):
         #Run the game on different thread so nothing freezes
         game_thread = Thread(target = self.runner.game_start)
         game_thread.setDaemon(True)
@@ -84,17 +84,18 @@ class Neural_Network:
         while self.runner.exitGame:
             time.sleep(.5)
         #Now the game is loaded so we can use the neural network
-        while not self.runner.exitGame:
-            if(self.runner.exitGame):
-                break
+        self.runner.score = 0
+        while target > self.runner.score:
+            #if(self.runner.exitGame):
+                #break
             input_x = np.array([self.runner.player_pos_x,self.runner.player_pos_y,self.runner.obst.y])
             player_x = self.runner.player_pos_x
             obstacle_x = self.runner.obst.x
             player_y = self.runner.player_pos_y
             obstacle_y = obstacle_x = self.runner.obst.x
             #Check if the Array is a 0D Array or = None
-            if input_x.all() == None:
-                break
+            #if input_x.all() == None:
+                #break
             option = ""
             #Forward Propagation := Making the decision to move up, down or stay the same
             output = self.forward(input_x)
@@ -147,8 +148,10 @@ class Neural_Network:
                     y = [1,0,1]
                 if option == "C":
                     y = [1,0,0]
-                self.runner.game_loop()
-                time.sleep(5)
+                #self.runner.game_loop()
+                    if target < self.runner.score:
+                        break
+                time.sleep(2)
             #Backward Propogation to make the neural network learn
             self.backward(input_x,y,output)
             print(self.runner.score)
